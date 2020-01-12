@@ -1,9 +1,8 @@
+import 'dart:math';
+
 import 'question.dart';
 
 class QuizBrain {
-  int _questionNumber = 0;
-
-  int _score = 0;
 
   List<Question> _questionBank = [
     Question('Some cats are actually allergic to humans', true),
@@ -21,11 +20,40 @@ class QuizBrain {
     Question('In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.', true),
   ];
 
-  void nextQuestion() {
-    //if (_questionNumber < _questionBank.length - 1) {
-    if(!isFinished()){
-      _questionNumber++;
+  int _score = 0;
+
+  List<int> questionDone = [];
+
+  int getRandom(){
+    int num, c = 0;
+    Random random = new Random();
+    num = random.nextInt(_questionBank.length);
+    print(num);
+    if (questionDone.isEmpty){
+      questionDone.add(num);
+    } else {
+      for(int i = 0; i< questionDone.length; i++) {
+        if (num == questionDone[i]) {
+          c++;
+          break;
+        }
+      }
+        if(c != 0)
+          num = getRandom();
+        else
+          questionDone.add(num);
     }
+    return num;
+  }
+
+  void nextQuestion() {
+    if(!isFinished()){
+      getRandom();
+    }
+  }
+
+  int getQuestionBankLength(){
+    return _questionBank.length;
   }
 
   void updateScore(int i){
@@ -37,22 +65,26 @@ class QuizBrain {
   }
 
   String getQuestionText() {
-    return _questionBank[_questionNumber].questionText;
+    if (questionDone.isNotEmpty){
+      return _questionBank[questionDone.last].questionText;
+    } else{
+      return _questionBank[getRandom()].questionText;
+    }
   }
 
   bool getCorrectAnswer() {
-    return _questionBank[_questionNumber].questionAnswer;
+    return _questionBank[questionDone.last].questionAnswer;
   }
 
   bool isFinished(){
-    if(_questionNumber == _questionBank.length - 1) {
+    if(questionDone.length == _questionBank.length) {
       return true;
     } else
       return false;
   }
 
   void reset(){
-    _questionNumber = 0;
     _score = 0;
+    questionDone = [];
   }
 }
