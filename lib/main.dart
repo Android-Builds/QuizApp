@@ -47,7 +47,6 @@ class _QuizPageState extends State<QuizPage> {
             onPressed: () {
               setState(() {
                 quizBrain.reset();
-                scoreKeeper.clear();
                 Navigator.pop(context);
               });
             },
@@ -141,9 +140,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
           ),
         ),
-        Row(
-          children: scoreKeeper,
-        )
       ],
     );
   }
