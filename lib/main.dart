@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'quiz_brain.dart';
+import 'package:quiver/async.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -67,23 +68,67 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
+  int _start = 10;
+  int _current = 10;
+
+  CountdownTimer countDownTimer = new CountdownTimer(
+    new Duration(seconds: 10),
+    new Duration(seconds: 1),
+  );
+
+  void getTime(){
+//    CountdownTimer countDownTimer = new CountdownTimer(
+//      new Duration(seconds: _start),
+//      new Duration(seconds: 1),
+//    );
+
+    var sub = countDownTimer.listen(null);
+    sub.onData((duration) {
+      setState(() {
+        _current = _start - duration.elapsed.inSeconds; });
+    }
+    );
+    sub.onDone(() {
+      sub.cancel();
+      setState(() {
+        quizBrain.nextQuestion();
+        getTime();
+        _start = 10;
+        _current = 10;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Text(
-              'Score: ' + quizBrain.getScore().toString(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
+        Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Score: ' + quizBrain.getScore().toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
               ),
             ),
-          ),
+            Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  '$_current',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                )
+            ),
+          ],
         ),
         Expanded(
           flex: 5,
